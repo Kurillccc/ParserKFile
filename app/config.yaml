@@ -1,0 +1,4 @@
+settings:
+  input_folder: "data/input"
+  output_folder: "data/output"
+  encoding: "utf-8"
