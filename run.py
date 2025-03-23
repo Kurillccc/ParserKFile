@@ -89,6 +89,9 @@ class Application(tk.Tk):
             return
 
         subregion = int(self.subregion_option.get())
+        h = int(self.h.get())
+        layer_count = int(self.layer_count.get())
+        density = int(self.density.get())
         coordinate = self.coordinate_option.get()
 
         try:
