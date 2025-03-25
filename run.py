@@ -2,24 +2,26 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 import os
 from app.parser import parse_k_file
-from app.processor import filter_elements_by_subregion, find_elements_for_layer, compute_and_generate_output, save_to_file
+from app.processor import filter_elements_by_subregion, find_elements_for_layer, compute_and_generate_output, \
+    save_to_file
 from app.generate_yaml import generate_layer_data, write_to_yaml
 
+
 class Application(tk.Tk):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         self.title("Парсинг KFile")
         self.geometry("600x400")
 
-        self.input_file_path = ""
-        self.output_folder = "data/output"
+        self.input_file_path: str = ""
+        self.output_folder: str = "data/output"
 
         self.resizable(False, False)
 
         self.create_widgets()
 
-    def create_widgets(self):
+    def create_widgets(self) -> None:
         """Создание элементов интерфейса"""
 
         # Кнопка для выбора входного файла
@@ -69,23 +71,23 @@ class Application(tk.Tk):
         self.output_text = tk.Text(self, height=9, width=84)
         self.output_text.grid(row=6, column=0, columnspan=2, pady=10)
 
-    def select_input_file(self):
+    def select_input_file(self) -> None:
         """Открывает диалог для выбора файла"""
         self.input_file_path = filedialog.askopenfilename(title="Выберите файл", filetypes=[("Text files", "*.k")])
         if self.input_file_path:
             self.input_file_label.config(text=os.path.basename(self.input_file_path))
 
-    def process_data(self):
+    def process_data(self) -> None:
         """Обрабатывает данные при нажатии кнопки"""
         if not self.input_file_path:
             messagebox.showerror("Ошибка", "Выберите файл для обработки")
             return
 
         try:
-            subregion = int(self.subregion_entry.get())
-            h = int(self.h_entry.get())
-            density = int(self.density_entry.get())
-            coordinate = self.coordinate_option.cget("text")
+            subregion: int = int(self.subregion_entry.get())
+            h: int = int(self.h_entry.get())
+            density: float = int(self.density_entry.get())
+            coordinate: str = self.coordinate_option.cget("text")
 
             # Парсим файл
             nodes, elements = parse_k_file(self.input_file_path)
@@ -96,7 +98,9 @@ class Application(tk.Tk):
             # Находим элементы по слоям
             layer_elements = find_elements_for_layer(nodes, filtered_elements, coordinate)
 
-            output_file_path = write_to_yaml(generate_layer_data(len(layer_elements), coordinate, density, h, nodes, filtered_elements), self.input_file_path)
+            output_file_path: str = write_to_yaml(
+                generate_layer_data(len(layer_elements), coordinate, density, h, nodes, filtered_elements),
+                self.input_file_path)
 
             # Отображаем результаты в текстовом поле
             self.output_text.delete(1.0, tk.END)
@@ -104,6 +108,7 @@ class Application(tk.Tk):
 
         except Exception as e:
             messagebox.showerror("Ошибка", f"Произошла ошибка при обработке данных: {e}")
+
 
 if __name__ == "__main__":
     app = Application()

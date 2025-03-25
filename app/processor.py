@@ -1,4 +1,8 @@
-def filter_elements_by_subregion(elements, target_subregion):
+from typing import Dict, Tuple, List
+
+
+def filter_elements_by_subregion(elements: Dict[int, Dict[str, List[int]]], target_subregion: int) -> Dict[
+    int, List[int]]:
     """Фильтрует элементы, оставляя только те, что принадлежат заданной подобласти."""
     return {
         element_id: data["nodes"]
@@ -7,9 +11,9 @@ def filter_elements_by_subregion(elements, target_subregion):
     }
 
 
-def group_nodes_by_coordinate(nodes, coordinate):
+def group_nodes_by_coordinate(nodes: Dict[int, Tuple[float, float, float]], coordinate: str) -> Dict[float, List[int]]:
     """Группирует узлы по координате X, Y или Z."""
-    grouped_nodes = {}
+    grouped_nodes: Dict[float, List[int]] = {}
 
     for node_id, (x, y, z) in nodes.items():
         if coordinate == "X":
@@ -29,11 +33,15 @@ def group_nodes_by_coordinate(nodes, coordinate):
     return grouped_nodes
 
 
-def find_elements_for_layer(nodes, elements, coordinate):
+def find_elements_for_layer(
+        nodes: Dict[int, Tuple[float, float, float]],
+        elements: Dict[int, List[int]],
+        coordinate: str
+) -> Dict[float, List[int]]:
     """Для каждого слоя находит элементы, связанные с узлами этого слоя."""
     grouped_nodes = group_nodes_by_coordinate(nodes, coordinate)
 
-    layer_elements = {}
+    layer_elements: Dict[float, List[int]] = {}
     processed_elements = set()  # Множество для отслеживания уже обработанных элементов
 
     for coord_value, node_ids in grouped_nodes.items():
@@ -48,21 +56,20 @@ def find_elements_for_layer(nodes, elements, coordinate):
         layer_elements[coord_value] = elements_in_layer
 
     # Проверка на одинаковое количество элементов в каждом слое
-    element_counts = [len(elements) for elements in layer_elements.values() if elements] # исключили пустые слои
+    element_counts = [len(elements) for elements in layer_elements.values() if elements]  # исключили пустые слои
     if len(set(element_counts)) > 1:
         raise ValueError("Ошибка: количество элементов в слоях не совпадает!")
 
-    # Удаление последнего слоя, тк он пустой
-    last_layer = list(layer_elements.keys())[-1]
-    if not layer_elements[last_layer]:
-        del layer_elements[last_layer]
+    # Удаление последнего слоя, если он пустой
+    if layer_elements and not layer_elements[list(layer_elements.keys())[-1]]:
+        del layer_elements[list(layer_elements.keys())[-1]]
 
     return layer_elements
 
 
-def compute_and_generate_output():
+def compute_and_generate_output() -> None:
     return
 
 
-def save_to_file():
+def save_to_file() -> None:
     return
