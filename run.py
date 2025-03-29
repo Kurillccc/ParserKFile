@@ -1,10 +1,12 @@
 import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
+from typing import Dict, List, Any
 
-from app.generate_yaml import generate_layer_data, write_to_yaml
+from app.generate_yaml import generate_layer_data, write_to_yaml, write_to_cd_by_k_word
 from app.parser import parse_k_file
 from app.processor import filter_elements_by_subregion, find_elements_for_layer
+from app.settings import output_file_name, put_cell_sets, put_stress_set, put_set_solid
 
 
 class Application(tk.Tk):
@@ -12,10 +14,11 @@ class Application(tk.Tk):
         super().__init__()
 
         self.title("Парсинг KFile")
-        self.geometry("600x400")
+        self.geometry("600x600")
 
-        self.input_file_path: str = ""
-        self.output_folder: str = "data/output"
+        self.input_k_file_path: str = ""
+        self.input_cd_file_path: str = ""
+        self.output_folder: str = "ParserKFile/app/data/output"
 
         self.resizable(False, False)
 
@@ -24,65 +27,82 @@ class Application(tk.Tk):
     def create_widgets(self) -> None:
         """Создание элементов интерфейса"""
 
-        # Кнопка для выбора входного файла
-        self.input_button = tk.Button(self, text="Выбрать файл", command=self.select_input_file)
-        self.input_button.grid(row=0, column=0, pady=10, padx=10, sticky="w")
+        # Кнопка для выбора входного k файла
+        self.input_k_button = tk.Button(self, text="Выбрать k файл", command=self.select_input_k_file)
+        self.input_k_button.grid(row=0, column=0, pady=10, padx=10, sticky="w")
 
-        # Поле для отображения выбранного файла
-        self.input_file_label = tk.Label(self, text="Выберите файл для обработки")
-        self.input_file_label.grid(row=0, column=1, pady=10, padx=10, sticky="w")
+        # Поле для отображения выбранного k файла
+        self.input_k_file_label = tk.Label(self, text="Выберите файл k для обработки")
+        self.input_k_file_label.grid(row=0, column=1, pady=10, padx=10, sticky="w")
+
+        # Кнопка для выбора входного cd файла
+        self.input_cd_button = tk.Button(self, text="Выбрать cd файл", command=self.select_input_cd_file)
+        self.input_cd_button.grid(row=1, column=0, pady=10, padx=10, sticky="w")
+
+        # Поле для отображения выбранного cd файла
+        self.input_cd_file_label = tk.Label(self, text="Выберите файл cd для обработки")
+        self.input_cd_file_label.grid(row=1, column=1, pady=10, padx=10, sticky="w")
 
         # Ввод для подобласти
         self.subregion_label = tk.Label(self, text="Введите номер подобласти:")
-        self.subregion_label.grid(row=1, column=0, pady=5, padx=10, sticky="w")
+        self.subregion_label.grid(row=2, column=0, pady=5, padx=10, sticky="w")
 
         # Текстовое поле для ввода номера подобласти
         self.subregion_entry = tk.Entry(self)
-        self.subregion_entry.grid(row=1, column=1, pady=5, padx=10)
+        self.subregion_entry.grid(row=2, column=1, pady=5, padx=10)
 
         # Ввод для высоты
         self.h_label = tk.Label(self, text="Введите h:")
-        self.h_label.grid(row=2, column=0, pady=5, padx=10, sticky="w")
+        self.h_label.grid(row=3, column=0, pady=5, padx=10, sticky="w")
 
         # Текстовое поле для ввода высоты
         self.h_entry = tk.Entry(self)
-        self.h_entry.grid(row=2, column=1, pady=5, padx=10)
+        self.h_entry.grid(row=3, column=1, pady=5, padx=10)
 
         # Ввод для плотности
         self.density_label = tk.Label(self, text="Введите плотность:")
-        self.density_label.grid(row=3, column=0, pady=5, padx=10, sticky="w")
+        self.density_label.grid(row=4, column=0, pady=5, padx=10, sticky="w")
 
         # Текстовое поле для ввода плотности
         self.density_entry = tk.Entry(self)
-        self.density_entry.grid(row=3, column=1, pady=5, padx=10)
+        self.density_entry.grid(row=4, column=1, pady=5, padx=10)
 
         # Выпадающий список для выбора координаты (X, Y, Z)
         self.coordinate_label = tk.Label(self, text="Выберите координату (X, Y, Z):")
-        self.coordinate_label.grid(row=4, column=0, pady=5, padx=10, sticky="w")
+        self.coordinate_label.grid(row=5, column=0, pady=5, padx=10, sticky="w")
 
         self.coordinate_option = tk.OptionMenu(self, tk.StringVar(), *["X", "Y", "Z"])
-        self.coordinate_option.grid(row=4, column=1, pady=5, padx=10)
+        self.coordinate_option.grid(row=5, column=1, pady=5, padx=10)
 
         # Кнопка для обработки данных
         self.process_button = tk.Button(self, text="Обработать", command=self.process_data)
-        self.process_button.grid(row=5, column=0, columnspan=2, pady=20)
+        self.process_button.grid(row=6, column=0, columnspan=2, pady=20)
 
         # Текстовое поле для отображения результатов
-        self.output_text = tk.Text(self, height=9, width=84)
-        self.output_text.grid(row=6, column=0, columnspan=2, pady=10)
+        self.output_text = tk.Text(self, height=20, width=84)
+        self.output_text.grid(row=7, column=0, columnspan=2, pady=10)
 
-    def select_input_file(self) -> None:
+    def select_input_k_file(self) -> None:
         """Открывает диалог для выбора файла"""
-        self.input_file_path = filedialog.askopenfilename(title="Выберите файл", filetypes=[("Text files", "*.k")])
-        if self.input_file_path:
-            self.input_file_label.config(text=os.path.basename(self.input_file_path))
+        self.input_k_file_path = filedialog.askopenfilename(title="Выберите k файл", filetypes=[("Text files", "*.k")])
+        if self.input_k_file_path:
+            self.input_k_file_label.config(text=os.path.basename(self.input_k_file_path))
+
+    def select_input_cd_file(self) -> None:
+        """Открывает диалог для выбора файла"""
+        self.input_cd_file_path = filedialog.askopenfilename(title="Выберите cd файл",
+                                                            filetypes=[("Text files", "*.cd")])
+        if self.input_cd_file_path:
+            self.input_cd_file_label.config(text=os.path.basename(self.input_cd_file_path))
 
     def process_data(self) -> None:
         """Обрабатывает данные при нажатии кнопки"""
-        if not self.input_file_path:
-            messagebox.showerror("Ошибка", "Выберите файл для обработки")
+        if not self.input_k_file_path:
+            messagebox.showerror("Ошибка", "Выберите k файл для обработки")
             return
-
+        if not self.input_cd_file_path:
+            messagebox.showerror("Ошибка", "Выберите cd файл для обработки")
+            return
         try:
             subregion: int = int(self.subregion_entry.get())
             h: int = int(self.h_entry.get())
@@ -90,24 +110,43 @@ class Application(tk.Tk):
             coordinate: str = self.coordinate_option.cget("text")
 
             # Парсим файл
-            nodes, elements = parse_k_file(self.input_file_path)
+            nodes, elements = parse_k_file(self.input_k_file_path)
+        except Exception as e:
+            messagebox.showerror("Ошибка", f"Произошла ошибка при сборе данных по k файлу: {e}")
 
+        try:
             # Фильтруем элементы
             filtered_elements = filter_elements_by_subregion(elements, subregion)
 
             # Находим элементы по слоям
             layer_elements = find_elements_for_layer(nodes, filtered_elements, coordinate)
 
-            output_file_path: str = write_to_yaml(
-                generate_layer_data(len(layer_elements), coordinate, density, h, nodes, filtered_elements),
-                self.input_file_path)
+            data: Dict[str, Any] = generate_layer_data(len(layer_elements), coordinate, density, h, nodes,
+                                                       filtered_elements)
+        except Exception as e:
+            messagebox.showerror("Ошибка", f"Произошла ошибка при обработке результатов: {e}")
+
+        try:
+            output_file_path: str = write_to_yaml(data, self.input_k_file_path, self.output_folder)
+        except Exception as e:
+            messagebox.showerror("Ошибка", f"Произошла ошибка при запаиси промежуточных результатов: {e}")
+
+        try:
+            # Сделай cd файл
+            write_to_cd_by_k_word(data, "CELL_SETS", self.input_cd_file_path, self.output_folder, put_cell_sets)
+            write_to_cd_by_k_word(data, "INITIAL_STRESS_SET", self.output_folder, self.output_folder, put_stress_set)
+            write_to_cd_by_k_word(data, "SET_SOLID", self.output_folder, self.output_folder, put_set_solid)
 
             # Отображаем результаты в текстовом поле
             self.output_text.delete(1.0, tk.END)
-            self.output_text.insert(tk.END, f"Результаты сохранены в {output_file_path}\n")
+            self.output_text.insert(tk.END, f"Промежуточные результаты сохранены в <b>{output_file_path}</b>\n"
+                                            f"Конечный файл помещен в data/output\n\n"
+                                            f"CELL_SETS вставлен после {put_cell_sets}\n"
+                                            f"INITIAL_STRESS_SET вставлен после {put_stress_set}\n"
+                                            f"SET_SOLID вставлен после {put_set_solid}\n")
 
         except Exception as e:
-            messagebox.showerror("Ошибка", f"Произошла ошибка при обработке данных: {e}")
+            messagebox.showerror("Ошибка", f"Произошла ошибка при записи данных в cd файл: {e}")
 
 
 if __name__ == "__main__":

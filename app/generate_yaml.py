@@ -5,7 +5,7 @@ from typing import Dict, List, Any
 import yaml
 
 from app.processor import find_elements_for_layer
-from app.settings import input_file_name, output_file_name
+from app.settings import input_file_name, output_file_name, BASE_DIR
 
 
 class CustomDumper(yaml.Dumper):
@@ -86,10 +86,10 @@ def write_to_yaml(data: Dict[str, Any], file_path: str, output_path: str) -> str
     directory: str = os.path.dirname(file_path)
 
     # Создаем путь для нового файла (например, output.yaml)
-    output_file_path: str = output_path + "/test2_data.k"
+    output_file_path: str = os.path.join(BASE_DIR, "data", "output", f"{output_file_name}_data.k")
 
     # Запись в YAML
-    with open(output_file_path, 'w') as file:
+    with open(output_file_path, 'w', encoding="utf-8") as file:
         yaml.dump(data, file, Dumper=CustomDumper, default_flow_style=False, allow_unicode=True, sort_keys=False,
                   indent=2)
 
@@ -98,10 +98,11 @@ def write_to_yaml(data: Dict[str, Any], file_path: str, output_path: str) -> str
 
 def write_to_cd_by_k_word(data: Dict[str, Any], section_name: str, file_path_cd: str, output_path: str,
                           key_word: str) -> None:
-    if not "output" in file_path_cd:
-        file_path_cd += "/" + input_file_name + ".cd"
-    else:
-        file_path_cd += "/" + output_file_name + ".cd"
+    if not ".cd" in file_path_cd:
+        if not "output" in file_path_cd:
+            file_path_cd += "/" + input_file_name + ".cd"
+        else:
+            file_path_cd: str = os.path.join(BASE_DIR, "data", "output", f"{output_file_name}.cd")
     file_path_txt: str = file_path_cd + ".txt"
     os.rename(file_path_cd, file_path_txt)
     output_lines = []
@@ -139,6 +140,6 @@ def write_to_cd_by_k_word(data: Dict[str, Any], section_name: str, file_path_cd:
         # Возвращаем обратно в .cd
         os.rename(file_path_txt, file_path_cd)
 
-    new_file_path = output_path + "/" + output_file_name + ".cd"
-    with open(new_file_path, "w", encoding="utf-8") as file:
+    output_file_path: str = os.path.join(BASE_DIR, "data", "output", f"{output_file_name}.cd")
+    with open(output_file_path, "w", encoding="utf-8") as file:
         file.writelines(output_lines)

@@ -6,7 +6,7 @@ from typing import Dict, List, Any
 from app.generate_yaml import write_to_yaml, generate_layer_data, write_to_cd_by_k_word
 from app.parser import parse_k_file
 from app.processor import filter_elements_by_subregion, group_nodes_by_coordinate, find_elements_for_layer
-from app.settings import input_file_name
+from app.settings import input_file_name, put_cell_sets, put_stress_set, put_set_solid
 
 
 @click.command()
@@ -60,20 +60,18 @@ def run(input: str, subregion: int, coordinate: str, density: float, h: float, o
 
     print("Переведем файл в требуемый формат")
     try:
-        write_to_yaml(
-            generate_layer_data(len(layer_elements), coordinate, density, h, nodes, filtered_elements),
-            input, output)
+        data: Dict[str, Any] = generate_layer_data(len(layer_elements), coordinate, density, h, nodes, filtered_elements)
+
+        write_to_yaml(data, input, output)
         print(f"Файл сохранен в {output}")
     except Exception as e:
         print(f"Не удалось создать файл\nОшибка{e}")
 
     print("Вставим в cd файл чтобы получить готовый вариант")
     try:
-        data: Dict[str, Any] = generate_layer_data(len(layer_elements), coordinate, density, h, nodes, filtered_elements)
-
-        write_to_cd_by_k_word(data, "CELL_SETS", input, output, "MESH_PARTS:")
-        write_to_cd_by_k_word(data, "INITIAL_STRESS_SET", output, output, "COMMON_SETTINGS:")
-        write_to_cd_by_k_word(data, "SET_SOLID", output, output, "NL_STATIC_PARAMS:")
+        write_to_cd_by_k_word(data, "CELL_SETS", input, output, put_cell_sets)
+        write_to_cd_by_k_word(data, "INITIAL_STRESS_SET", output, output, put_stress_set)
+        write_to_cd_by_k_word(data, "SET_SOLID", output, output, put_set_solid)
 
     except Exception as e:
         print(f"Не удалось сгенерировать файл\nОшибка{e}")
