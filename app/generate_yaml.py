@@ -1,9 +1,11 @@
-import uuid
-import yaml
 import os
-
+import uuid
 from typing import Dict, List, Any
+
+import yaml
+
 from app.processor import find_elements_for_layer
+from app.settings import input_file_name, output_file_name
 
 
 class CustomDumper(yaml.Dumper):
@@ -94,12 +96,16 @@ def write_to_yaml(data: Dict[str, Any], file_path: str, output_path: str) -> str
     return directory
 
 
-def write_to_cd_by_k_word(file_path_input: str, output_path: str, key_word: str, section: str) -> None:
-    file_path_data = output_path + "/test2_data.k"
-    file_path_cd = file_path_input + "/test0.cd"
+def write_to_cd_by_k_word(data: Dict[str, Any], section_name: str, file_path_cd: str, output_path: str,
+                          key_word: str) -> None:
+    if not "output" in file_path_cd:
+        file_path_cd += "/" + input_file_name + ".cd"
+    else:
+        file_path_cd += "/" + output_file_name + ".cd"
     file_path_txt = file_path_cd + ".txt"
     os.rename(file_path_cd, file_path_txt)
     output_lines = []
+    last_line = False
     try:
         with open(file_path_txt, "r", encoding="utf-8") as file:
             lines = file.readlines()
@@ -109,39 +115,30 @@ def write_to_cd_by_k_word(file_path_input: str, output_path: str, key_word: str,
 
         for i, line in enumerate(lines):
             if found_key_word and not inserting:
-                if line.startswith((" ", "\t")):
+                if line.startswith((" ", "\t")) and i != len(lines) - 1:
                     output_lines.append(line)
                     continue  # Пропускаем строки с пробелами
                 else:
-                    with open(file_path_data, "r", encoding="utf-8") as k_file:
-                        data = k_file.read()
-
-                    flag: bool = False
-                    for j, line_data in enumerate(data.splitlines()):
-                        if line_data.strip() == section:
-                            output_lines.append(line_data + "\n")
-                            print(output_lines)
-                            flag = True
-                            continue
-                        if flag and line_data.startswith((" ", "\t")):
-                            output_lines.append(line_data  + "\n")
-                            print(line_data)
-                            print(output_lines)
-                        else:
-                            break
-
+                    if i == len(lines) - 1:
+                        output_lines.append(line)
+                        last_line = True
+                    # Нашли следующую секцию, вставляем данные перед ней
+                    output_lines.append(
+                        yaml.dump({section_name: data[section_name]}, Dumper=CustomDumper, default_flow_style=False,
+                                  allow_unicode=True, sort_keys=False,
+                                  indent=2))
                     inserting = True  # Устанавливаем флаг, чтобы вставка произошла только один раз
 
             if line.strip() == key_word:
                 found_key_word = True
 
-            output_lines.append(line)
+            if not last_line: output_lines.append(line)
     except Exception as e:
         print(f"Не удалось вставить данные в cd файл\nОшибка{e}")
     finally:
         # Возвращаем обратно в .cd
         os.rename(file_path_txt, file_path_cd)
 
-    new_file_path = output_path + "/test2.cd"
-    with open(new_file_path, "w", encoding="utf-8", errors="ignore") as file:
+    new_file_path = output_path + "/" + output_file_name + ".cd"
+    with open(new_file_path, "w", encoding="utf-8") as file:
         file.writelines(output_lines)

@@ -1,10 +1,11 @@
-import click
 import os
-import traceback
-from typing import Dict, List, Any
+
+import click
+
+from app.generate_yaml import write_to_yaml, generate_layer_data, write_to_cd_by_k_word
 from app.parser import parse_k_file
 from app.processor import filter_elements_by_subregion, group_nodes_by_coordinate, find_elements_for_layer
-from app.generate_yaml import write_to_yaml, generate_layer_data, write_to_cd_by_k_word
+from app.settings import input_file_name
 
 
 @click.command()
@@ -15,7 +16,7 @@ from app.generate_yaml import write_to_yaml, generate_layer_data, write_to_cd_by
 @click.option("--h", default=1000.0, type=float, help="Высота слоя (м)")
 @click.option("--output", default="data/output", help="Папка для сохранения")
 def run(input: str, subregion: int, coordinate: str, density: float, h: float, output) -> None:
-    k_file_path = os.path.join(input, "test0.k")  # Формируем путь к файлу
+    k_file_path = os.path.join(input, input_file_name + ".k")  # Формируем путь к файлу
 
     print("Чтение файла:", k_file_path)
     try:
@@ -69,14 +70,15 @@ def run(input: str, subregion: int, coordinate: str, density: float, h: float, o
     try:
         data = generate_layer_data(len(layer_elements), coordinate, density, h, nodes, filtered_elements)
 
-        write_to_cd_by_k_word(input, output,"MESH_PARTS:", "CELL_SETS:")
-        write_to_cd_by_k_word(input, output,"COMMON_SETTINGS:", "INITIAL_STRESS_SET:")
-        write_to_cd_by_k_word(input, output,"NL_STATIC_PARAMS:", "SET_SOLID:")
+        write_to_cd_by_k_word(data, "CELL_SETS", input, output, "MESH_PARTS:")
+        write_to_cd_by_k_word(data, "INITIAL_STRESS_SET", output, output, "COMMON_SETTINGS:")
+        write_to_cd_by_k_word(data, "SET_SOLID", output, output, "NL_STATIC_PARAMS:")
 
     except Exception as e:
         print(f"Не удалось сгенерировать файл\nОшибка{e}")
 
     print("Выполнено\n")
+
 
 if __name__ == "__main__":
     run()

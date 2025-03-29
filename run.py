@@ -1,10 +1,10 @@
+import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
-import os
-from app.parser import parse_k_file
-from app.processor import filter_elements_by_subregion, find_elements_for_layer, compute_and_generate_output, \
-    save_to_file
+
 from app.generate_yaml import generate_layer_data, write_to_yaml
+from app.parser import parse_k_file
+from app.processor import filter_elements_by_subregion, find_elements_for_layer
 
 
 class Application(tk.Tk):
