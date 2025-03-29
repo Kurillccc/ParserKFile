@@ -1,6 +1,7 @@
 import os
 
 import click
+from typing import Dict, List, Any
 
 from app.generate_yaml import write_to_yaml, generate_layer_data, write_to_cd_by_k_word
 from app.parser import parse_k_file
@@ -68,7 +69,7 @@ def run(input: str, subregion: int, coordinate: str, density: float, h: float, o
 
     print("Вставим в cd файл чтобы получить готовый вариант")
     try:
-        data = generate_layer_data(len(layer_elements), coordinate, density, h, nodes, filtered_elements)
+        data: Dict[str, Any] = generate_layer_data(len(layer_elements), coordinate, density, h, nodes, filtered_elements)
 
         write_to_cd_by_k_word(data, "CELL_SETS", input, output, "MESH_PARTS:")
         write_to_cd_by_k_word(data, "INITIAL_STRESS_SET", output, output, "COMMON_SETTINGS:")

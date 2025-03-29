@@ -86,7 +86,7 @@ def write_to_yaml(data: Dict[str, Any], file_path: str, output_path: str) -> str
     directory: str = os.path.dirname(file_path)
 
     # Создаем путь для нового файла (например, output.yaml)
-    output_file_path = output_path + "/test2_data.k"
+    output_file_path: str = output_path + "/test2_data.k"
 
     # Запись в YAML
     with open(output_file_path, 'w') as file:
@@ -102,16 +102,16 @@ def write_to_cd_by_k_word(data: Dict[str, Any], section_name: str, file_path_cd:
         file_path_cd += "/" + input_file_name + ".cd"
     else:
         file_path_cd += "/" + output_file_name + ".cd"
-    file_path_txt = file_path_cd + ".txt"
+    file_path_txt: str = file_path_cd + ".txt"
     os.rename(file_path_cd, file_path_txt)
     output_lines = []
-    last_line = False
+    last_line: bool = False
     try:
         with open(file_path_txt, "r", encoding="utf-8") as file:
             lines = file.readlines()
 
-        inserting = False  # Флаг, показывающий, когда нужно вставлять данные
-        found_key_word = False  # Флаг, показывающий, что нашли строку "1"
+        inserting: bool = False  # Флаг, показывающий, когда нужно вставлять данные
+        found_key_word: bool = False  # Флаг, показывающий, что нашли строку "1"
 
         for i, line in enumerate(lines):
             if found_key_word and not inserting:
