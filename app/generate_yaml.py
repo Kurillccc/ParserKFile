@@ -79,12 +79,12 @@ def generate_layer_data(num_layers: int, coordinate: str, density: float, h: flo
     }
 
 
-def write_to_yaml(data: Dict[str, Any], file_path: str) -> str:
+def write_to_yaml(data: Dict[str, Any], file_path: str, output_path: str) -> str:
     """Запись данных в YAML файл."""
     directory: str = os.path.dirname(file_path)
 
     # Создаем путь для нового файла (например, output.yaml)
-    output_file_path: str = os.path.join(directory, 'output.k')
+    output_file_path = output_path + "/test2_data.k"
 
     # Запись в YAML
     with open(output_file_path, 'w') as file:
@@ -92,3 +92,56 @@ def write_to_yaml(data: Dict[str, Any], file_path: str) -> str:
                   indent=2)
 
     return directory
+
+
+def write_to_cd_by_k_word(file_path_input: str, output_path: str, key_word: str, section: str) -> None:
+    file_path_data = output_path + "/test2_data.k"
+    file_path_cd = file_path_input + "/test0.cd"
+    file_path_txt = file_path_cd + ".txt"
+    os.rename(file_path_cd, file_path_txt)
+    output_lines = []
+    try:
+        with open(file_path_txt, "r", encoding="utf-8") as file:
+            lines = file.readlines()
+
+        inserting = False  # Флаг, показывающий, когда нужно вставлять данные
+        found_key_word = False  # Флаг, показывающий, что нашли строку "1"
+
+        for i, line in enumerate(lines):
+            if found_key_word and not inserting:
+                if line.startswith((" ", "\t")):
+                    output_lines.append(line)
+                    continue  # Пропускаем строки с пробелами
+                else:
+                    with open(file_path_data, "r", encoding="utf-8") as k_file:
+                        data = k_file.read()
+
+                    flag: bool = False
+                    for j, line_data in enumerate(data.splitlines()):
+                        if line_data.strip() == section:
+                            output_lines.append(line_data + "\n")
+                            print(output_lines)
+                            flag = True
+                            continue
+                        if flag and line_data.startswith((" ", "\t")):
+                            output_lines.append(line_data  + "\n")
+                            print(line_data)
+                            print(output_lines)
+                        else:
+                            break
+
+                    inserting = True  # Устанавливаем флаг, чтобы вставка произошла только один раз
+
+            if line.strip() == key_word:
+                found_key_word = True
+
+            output_lines.append(line)
+    except Exception as e:
+        print(f"Не удалось вставить данные в cd файл\nОшибка{e}")
+    finally:
+        # Возвращаем обратно в .cd
+        os.rename(file_path_txt, file_path_cd)
+
+    new_file_path = output_path + "/test2.cd"
+    with open(new_file_path, "w", encoding="utf-8", errors="ignore") as file:
+        file.writelines(output_lines)

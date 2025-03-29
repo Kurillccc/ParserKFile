@@ -65,11 +65,3 @@ def find_elements_for_layer(
         del layer_elements[list(layer_elements.keys())[-1]]
 
     return layer_elements
-
-
-def compute_and_generate_output() -> None:
-    return
-
-
-def save_to_file() -> None:
-    return
