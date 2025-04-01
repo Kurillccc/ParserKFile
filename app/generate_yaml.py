@@ -18,7 +18,7 @@ def generate_unique_id() -> str:
     return uuid.uuid4().hex
 
 
-def generate_layer_data(num_layers: int, coordinate: str, density: float, h: float,
+def generate_layer_data(num_layers: int, coordinate: str, density: float, PR: float, h: float,
                         nodes: Dict[int, List[float]], filtered_elements: List[Dict[str, Any]]) -> Dict[str, Any]:
     """Генерация данных для всех слоев с учетом выбранной координаты."""
     cell_sets: List[Dict[str, Any]] = []
@@ -36,9 +36,18 @@ def generate_layer_data(num_layers: int, coordinate: str, density: float, h: flo
         h_for_layer: float = h * (num_layers - layer_id) / (num_layers - 1) if num_layers > 1 else h
 
         # Определяем значения SIG в зависимости от выбранной координаты
-        sigxx: float = density * 9.8 * h_for_layer if coordinate == 'X' else 0
-        sigyy: float = density * 9.8 * h_for_layer if coordinate == 'Y' else 0
-        sigzz: float = density * 9.8 * h_for_layer if coordinate == 'Z' else 0
+        if coordinate == 'X':
+            sigxx: float = density * 9.8 * h_for_layer
+            sigyy: float = density * PR / (1 - PR)
+            sigzz: float = density * PR / (1 - PR)
+        elif coordinate == 'Y':
+            sigxx: float = density * PR / (1 - PR)
+            sigyy: float = density * 9.8 * h_for_layer
+            sigzz: float = density * PR / (1 - PR)
+        elif coordinate == 'Z':
+            sigxx: float = density * PR / (1 - PR)
+            sigyy: float = density * PR / (1 - PR)
+            sigzz: float = density * 9.8 * h_for_layer
 
         # Заполнение данных для CELL_SETS
         cell_sets.append({

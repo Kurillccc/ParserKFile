@@ -3,7 +3,7 @@ import os
 # Навзвание входных файлов
 input_file_name: str = "test0"
 # Название выходных файлов
-output_file_name: str = "test2"
+output_file_name: str = "debug"
 
 # После MESH_PARTS: вставится cell_sets
 put_cell_sets: str = "MESH_PARTS:"

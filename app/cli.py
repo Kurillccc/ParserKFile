@@ -13,10 +13,11 @@ from app.settings import input_file_name, put_cell_sets, put_stress_set, put_set
 @click.option("--input", default="data/input", help="Папка с исходными файлами")
 @click.option("--subregion", default=1, type=int, help="Подобласть для фильтрации")
 @click.option("--coordinate", default='Y', type=str, help="Координата для фильтрации слоев")
-@click.option("--density", default=2700.0, type=float, help="Плотность материала (кг/м³)")
+@click.option("--density", default=-2700.0, type=float, help="Плотность материала (кг/м³)")
+@click.option("--PR", default=0.32, type=float, help="Коэффициент Пуассона PR")
 @click.option("--h", default=1000.0, type=float, help="Высота слоя (м)")
 @click.option("--output", default="data/output", help="Папка для сохранения")
-def run(input: str, subregion: int, coordinate: str, density: float, h: float, output) -> None:
+def run(input: str, subregion: int, coordinate: str, density: float, PR: float, h: float, output: str) -> None:
     k_file_path = os.path.join(input, input_file_name + ".k")  # Формируем путь к файлу
 
     print("Чтение файла:", k_file_path)
@@ -60,7 +61,7 @@ def run(input: str, subregion: int, coordinate: str, density: float, h: float, o
 
     print("Переведем файл в требуемый формат")
     try:
-        data: Dict[str, Any] = generate_layer_data(len(layer_elements), coordinate, density, h, nodes, filtered_elements)
+        data: Dict[str, Any] = generate_layer_data(len(layer_elements), coordinate, density, PR, h, nodes, filtered_elements)
 
         write_to_yaml(data, input, output)
         print(f"Файл сохранен в {output}")

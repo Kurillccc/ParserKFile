@@ -14,7 +14,7 @@ class Application(tk.Tk):
         super().__init__()
 
         self.title("Парсинг KFile")
-        self.geometry("600x600")
+        self.geometry("600x630")
 
         self.input_k_file_path: str = ""
         self.input_cd_file_path: str = ""
@@ -67,20 +67,28 @@ class Application(tk.Tk):
         self.density_entry = tk.Entry(self)
         self.density_entry.grid(row=4, column=1, pady=5, padx=10)
 
+        # Ввод для коэффициента Пуассона PR
+        self.pr_label = tk.Label(self, text="Введите коэффициент Пуассона PR:")
+        self.pr_label.grid(row=5, column=0, pady=5, padx=10, sticky="w")
+
+        # Текстовое поле для ввода коэффициента Пуассона PR
+        self.pr_entry = tk.Entry(self)
+        self.pr_entry.grid(row=5, column=1, pady=5, padx=10)
+
         # Выпадающий список для выбора координаты (X, Y, Z)
         self.coordinate_label = tk.Label(self, text="Выберите координату (X, Y, Z):")
-        self.coordinate_label.grid(row=5, column=0, pady=5, padx=10, sticky="w")
+        self.coordinate_label.grid(row=6, column=0, pady=5, padx=10, sticky="w")
 
         self.coordinate_option = tk.OptionMenu(self, tk.StringVar(), *["X", "Y", "Z"])
-        self.coordinate_option.grid(row=5, column=1, pady=5, padx=10)
+        self.coordinate_option.grid(row=6, column=1, pady=5, padx=10)
 
         # Кнопка для обработки данных
         self.process_button = tk.Button(self, text="Обработать", command=self.process_data)
-        self.process_button.grid(row=6, column=0, columnspan=2, pady=20)
+        self.process_button.grid(row=7, column=0, columnspan=2, pady=20)
 
         # Текстовое поле для отображения результатов
         self.output_text = tk.Text(self, height=20, width=84)
-        self.output_text.grid(row=7, column=0, columnspan=2, pady=10)
+        self.output_text.grid(row=8, column=0, columnspan=2, pady=10)
 
     def select_input_k_file(self) -> None:
         """Открывает диалог для выбора файла"""
@@ -106,7 +114,8 @@ class Application(tk.Tk):
         try:
             subregion: int = int(self.subregion_entry.get())
             h: int = int(self.h_entry.get())
-            density: float = int(self.density_entry.get())
+            density: float = - float(self.density_entry.get())
+            PR: float = float(self.pr_entry.get())
             coordinate: str = self.coordinate_option.cget("text")
 
             # Парсим файл
@@ -121,7 +130,13 @@ class Application(tk.Tk):
             # Находим элементы по слоям
             layer_elements = find_elements_for_layer(nodes, filtered_elements, coordinate)
 
-            data: Dict[str, Any] = generate_layer_data(len(layer_elements), coordinate, density, h, nodes,
+            element_counts = [len(elements) for elements in layer_elements.values() if
+                              elements]  # исключили пустые слои
+
+            if len(set(element_counts)) > 1:
+                messagebox.showerror("Предупреждение", "Количество элементов в слоях не совпадает!")
+
+            data: Dict[str, Any] = generate_layer_data(len(layer_elements), coordinate, density, PR, h, nodes,
                                                        filtered_elements)
         except Exception as e:
             messagebox.showerror("Ошибка", f"Произошла ошибка при обработке результатов: {e}")
@@ -139,7 +154,7 @@ class Application(tk.Tk):
 
             # Отображаем результаты в текстовом поле
             self.output_text.delete(1.0, tk.END)
-            self.output_text.insert(tk.END, f"Промежуточные результаты сохранены в <b>{output_file_path}</b>\n"
+            self.output_text.insert(tk.END, f"Промежуточные результаты сохранены в {output_file_path}\n"
                                             f"Конечный файл помещен в data/output\n\n"
                                             f"CELL_SETS вставлен после {put_cell_sets}\n"
                                             f"INITIAL_STRESS_SET вставлен после {put_stress_set}\n"
