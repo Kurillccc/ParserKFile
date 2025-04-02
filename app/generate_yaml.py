@@ -27,15 +27,13 @@ def generate_layer_data(num_layers: int, coordinate: str, density: float, PR: fl
 
     layer_elements: Dict[float, List[int]] = find_elements_for_layer(nodes, filtered_elements, coordinate)
 
-    h_for_one_layer = h / num_layers / 2
-
     for i, (coord_value, elements_in_layer) in enumerate(layer_elements.items()):
         layer_id: int = i + 1
         unic_id: str = generate_unique_id()
         new_unic_id: str = generate_unique_id()
 
         # Вычисление высоты слоя (h_for_layer)
-        h_for_layer: float = h_for_one_layer * layer_id
+        h_for_layer: float = h / num_layers * (layer_id - 1) + h / (2 * num_layers)
 
         # Определяем значения SIG в зависимости от выбранной координаты
         if coordinate == 'X':
