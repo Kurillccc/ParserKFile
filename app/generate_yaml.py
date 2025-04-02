@@ -106,7 +106,7 @@ def write_to_yaml(data: Dict[str, Any], file_path: str, output_path: str) -> str
 
 
 def write_to_cd_by_k_word(data: Dict[str, Any], section_name: str, file_path_cd: str, output_path: str,
-                          key_word: str) -> None:
+                          key_words: List[str]) -> None:
     if not ".cd" in file_path_cd:
         if not "output" in file_path_cd:
             file_path_cd += "/" + input_file_name + ".cd"
@@ -117,7 +117,7 @@ def write_to_cd_by_k_word(data: Dict[str, Any], section_name: str, file_path_cd:
     output_lines = []
     last_line: bool = False
     try:
-        with open(file_path_txt, "r", encoding="utf-8") as file:
+        with open(file_path_txt, "r", encoding="utf-8", errors='ignore') as file:
             lines = file.readlines()
 
         inserting: bool = False  # Флаг, показывающий, когда нужно вставлять данные
@@ -139,7 +139,7 @@ def write_to_cd_by_k_word(data: Dict[str, Any], section_name: str, file_path_cd:
                                   indent=2))
                     inserting = True  # Устанавливаем флаг, чтобы вставка произошла только один раз
 
-            if line.strip() == key_word:
+            if line.strip() in key_words:
                 found_key_word = True
 
             if not last_line: output_lines.append(line)

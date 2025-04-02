@@ -5,7 +5,7 @@ from typing import Dict, List, Any
 
 from app.generate_yaml import write_to_yaml, generate_layer_data, write_to_cd_by_k_word
 from app.parser import parse_k_file
-from app.processor import filter_elements_by_subregion, group_nodes_by_coordinate, find_elements_for_layer
+from app.processor import filter_elements_by_subregion, group_nodes_by_coordinate, find_elements_for_layer, find_h_and_home
 from app.settings import input_file_name, put_cell_sets, put_stress_set, put_set_solid
 
 
@@ -14,10 +14,9 @@ from app.settings import input_file_name, put_cell_sets, put_stress_set, put_set
 @click.option("--subregion", default=1, type=int, help="Подобласть для фильтрации")
 @click.option("--coordinate", default='Y', type=str, help="Координата для фильтрации слоев")
 @click.option("--density", default=-2700.0, type=float, help="Плотность материала (кг/м³)")
-@click.option("--PR", default=0.32, type=float, help="Коэффициент Пуассона PR")
-@click.option("--h", default=1000.0, type=float, help="Высота слоя (м)")
+@click.option("--pr", default=0.32, type=float, help="Коэффициент Пуассона PR")
 @click.option("--output", default="data/output", help="Папка для сохранения")
-def run(input: str, subregion: int, coordinate: str, density: float, PR: float, h: float, output: str) -> None:
+def run(input: str, subregion: int, coordinate: str, density: float, pr: float, output: str) -> None:
     k_file_path = os.path.join(input, input_file_name + ".k")  # Формируем путь к файлу
 
     print("Чтение файла:", k_file_path)
@@ -35,23 +34,43 @@ def run(input: str, subregion: int, coordinate: str, density: float, PR: float, 
     except Exception as e:
         print(f"Не удалось отфильтровать элементы по подобласти\nОшибка{e}")
 
-    print(f"Отберем id слов по порядку от 0 по координате {coordinate}\n")
-    group_nodes = group_nodes_by_coordinate(nodes, coordinate)
+    print(f"Выделим наш прямоугольник от домика сверху и найдем высоту")
     try:
+        h, nodes, nodes_outside = find_h_and_home(nodes, coordinate)
+        print("Координаты нашего грунта")
+        for node_id, (x, y, z) in nodes.items():
+            print(f"Узел {node_id}: ({x}, {y}, {z})")
+        print(f"Высота = {h}")
+        print("Координаты нашего домика")
+        if len(nodes_outside) != 0:
+            for node_id, (x, y, z) in nodes_outside:
+                print(f"Узел {node_id}: ({x}, {y}, {z})")
+        else:
+            print("А тут нет домика")
+
+        print()
+    except Exception as e:
+        print(f"Не удалось отделить домик от прямоугольника\nОшибка {e}")
+
+    print(f"Отберем id слов по порядку от 0 по координате {coordinate}\n")
+    try:
+        group_nodes = group_nodes_by_coordinate(nodes, coordinate)
         for coord_value, id in group_nodes.items():
             print(f"SID: {coordinate} = {coord_value}:")
+            print(f"Count: {len(id)}")
             print("ID:")
             for element_id in id:
                 print(f"      - {element_id}")
             print()
     except Exception as e:
-        print(f"Не удалось отобрать id слоев\nОшибка{e}")
+        print(f"Не удалось отобрать id слоев\nОшибка {e}")
 
     print(f"Отбираем элементы, которые принадлежат слою по координате {coordinate}\n")
     try:
         layer_elements = find_elements_for_layer(nodes, filtered_elements, coordinate)
         for coord_value, elements_in_layer in layer_elements.items():
             print(f"SID: {coordinate} = {coord_value}:")
+            print(f"Count: {len(elements_in_layer)}")
             print("ELEMENTS:")
             for element_id in elements_in_layer:
                 print(f"      - {element_id}")
@@ -61,7 +80,7 @@ def run(input: str, subregion: int, coordinate: str, density: float, PR: float, 
 
     print("Переведем файл в требуемый формат")
     try:
-        data: Dict[str, Any] = generate_layer_data(len(layer_elements), coordinate, density, PR, h, nodes, filtered_elements)
+        data: Dict[str, Any] = generate_layer_data(len(layer_elements), coordinate, density, pr, h, nodes, filtered_elements)
 
         write_to_yaml(data, input, output)
         print(f"Файл сохранен в {output}")
