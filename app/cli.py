@@ -13,7 +13,7 @@ from app.settings import input_file_name, put_cell_sets, put_stress_set, put_set
 @click.option("--input", default="data/input", help="Папка с исходными файлами")
 @click.option("--subregion", default=1, type=int, help="Подобласть для фильтрации")
 @click.option("--coordinate", default='Y', type=str, help="Координата для фильтрации слоев")
-@click.option("--density", default=-2700.0, type=float, help="Плотность материала (кг/м³)")
+@click.option("--density", default=-1500.0, type=float, help="Плотность материала (кг/м³)")
 @click.option("--pr", default=0.32, type=float, help="Коэффициент Пуассона PR")
 @click.option("--output", default="data/output", help="Папка для сохранения")
 def run(input: str, subregion: int, coordinate: str, density: float, pr: float, output: str) -> None:
