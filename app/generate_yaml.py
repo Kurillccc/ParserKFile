@@ -38,15 +38,15 @@ def generate_layer_data(num_layers: int, coordinate: str, density: float, PR: fl
         # Определяем значения SIG в зависимости от выбранной координаты
         if coordinate == 'X':
             sigxx: float = density * 9.8 * h_for_layer
-            sigyy: float = density * PR / (1 - PR)
-            sigzz: float = density * PR / (1 - PR)
+            sigyy: float = density * 9.8 * h_for_layer * PR / (1 - PR)
+            sigzz: float = density * 9.8 * h_for_layer * PR / (1 - PR)
         elif coordinate == 'Y':
-            sigxx: float = density * PR / (1 - PR)
+            sigxx: float = density * 9.8 * h_for_layer * PR / (1 - PR)
             sigyy: float = density * 9.8 * h_for_layer
-            sigzz: float = density * PR / (1 - PR)
+            sigzz: float = density * 9.8 * h_for_layer * PR / (1 - PR)
         elif coordinate == 'Z':
-            sigxx: float = density * PR / (1 - PR)
-            sigyy: float = density * PR / (1 - PR)
+            sigxx: float = density * 9.8 * h_for_layer * PR / (1 - PR)
+            sigyy: float = density * 9.8 * h_for_layer * PR / (1 - PR)
             sigzz: float = density * 9.8 * h_for_layer
 
         # Заполнение данных для CELL_SETS
