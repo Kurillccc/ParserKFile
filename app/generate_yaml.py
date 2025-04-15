@@ -33,7 +33,7 @@ def generate_layer_data(num_layers: int, coordinate: str, density: float, PR: fl
         new_unic_id: str = generate_unique_id()
 
         # Вычисление высоты слоя (h_for_layer)
-        h_for_layer: float = h / num_layers * (layer_id - 1) + h / (2 * num_layers)
+        h_for_layer: float = h / num_layers * (len(layer_elements.items()) - layer_id - 1) + h / (2 * num_layers)
 
         # Определяем значения SIG в зависимости от выбранной координаты
         if coordinate == 'X':
