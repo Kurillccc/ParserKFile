@@ -108,7 +108,11 @@ class Application(tk.Tk):
             density: float = - float(self.density_entry.get())
             PR: float = float(self.pr_entry.get())
             coordinate: str = self.coordinate_option.cget("text")
+        except Exception as e:
+            messagebox.showerror("Ошибка", f"Произошла ошибка входных данных: {e}")
+            return
 
+        try:
             # Парсим файл
             nodes, elements = parse_k_file(self.input_k_file_path)
         except Exception as e:
@@ -144,14 +148,14 @@ class Application(tk.Tk):
 
         try:
             # Сделай cd файл
-            write_to_cd_by_k_word(data, "CELL_SETS", self.input_cd_file_path, self.output_folder, put_cell_sets)
-            write_to_cd_by_k_word(data, "INITIAL_STRESS_SET", self.output_folder, self.output_folder, put_stress_set)
-            write_to_cd_by_k_word(data, "SET_SOLID", self.output_folder, self.output_folder, put_set_solid)
+            output = write_to_cd_by_k_word(data, "CELL_SETS", self.input_cd_file_path, put_cell_sets)
+            write_to_cd_by_k_word(data, "INITIAL_STRESS_SET", output, put_stress_set)
+            output_path: str = write_to_cd_by_k_word(data, "SET_SOLID", output, put_set_solid)
 
             # Отображаем результаты в текстовом поле
             self.output_text.delete(1.0, tk.END)
-            self.output_text.insert(tk.END, f"Промежуточные и конечные результаты сохранены в data/output\n"
-                                            f"Высота: {h}\n"
+            self.output_text.insert(tk.END, f"Промежуточные и конечные результаты сохранены в {output_path}\n"
+                                            f"\nВысота: {h}\n"
                                             f"{'Домик есть и его влияние учитывается' if len(nodes_outside) != 0 else 'Домика нет'}\n\n"
                                             f"CELL_SETS вставлен после {put_cell_sets}\n"
                                             f"INITIAL_STRESS_SET вставлен после {put_stress_set}\n"

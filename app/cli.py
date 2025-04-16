@@ -89,9 +89,9 @@ def run(input: str, subregion: int, coordinate: str, density: float, pr: float, 
 
     print("Вставим в cd файл чтобы получить готовый вариант")
     try:
-        write_to_cd_by_k_word(data, "CELL_SETS", input, output, put_cell_sets)
-        write_to_cd_by_k_word(data, "INITIAL_STRESS_SET", output, output, put_stress_set)
-        write_to_cd_by_k_word(data, "SET_SOLID", output, output, put_set_solid)
+        output = write_to_cd_by_k_word(data, "CELL_SETS", input, put_cell_sets)
+        write_to_cd_by_k_word(data, "INITIAL_STRESS_SET", output, put_stress_set)
+        write_to_cd_by_k_word(data, "SET_SOLID", output, put_set_solid)
 
     except Exception as e:
         print(f"Не удалось сгенерировать файл\nОшибка{e}")

@@ -1,4 +1,5 @@
 import os
+import sys
 import uuid
 from typing import Dict, List, Any
 
@@ -33,7 +34,7 @@ def generate_layer_data(num_layers: int, coordinate: str, density: float, PR: fl
         new_unic_id: str = generate_unique_id()
 
         # Вычисление высоты слоя (h_for_layer)
-        h_for_layer: float = h / num_layers * (len(layer_elements.items()) - layer_id - 1) + h / (2 * num_layers)
+        h_for_layer: float = h / num_layers * (len(layer_elements.items()) - layer_id) + h / (2 * num_layers)
 
         # Определяем значения SIG в зависимости от выбранной координаты
         if coordinate == 'X':
@@ -90,12 +91,34 @@ def generate_layer_data(num_layers: int, coordinate: str, density: float, PR: fl
     }
 
 
+def get_output_dir():
+    if getattr(sys, 'frozen', False):
+        # Если приложение собрано в .exe или .app — сохраняем на рабочий стол
+        desktop_dir = os.path.join(os.path.expanduser("~"), "Desktop", "output")
+        os.makedirs(desktop_dir, exist_ok=True)
+        return desktop_dir
+    else:
+        # В режиме разработки сохраняем в проект
+        output_dir = os.path.join(BASE_DIR, "data", "output")
+        os.makedirs(output_dir, exist_ok=True)
+        return output_dir
+
+
 def write_to_yaml(data: Dict[str, Any], file_path: str, output_path: str) -> str:
     """Запись данных в YAML файл."""
+    # Получаем директорию, откуда брать имя файла
     directory: str = os.path.dirname(file_path)
 
-    # Создаем путь для нового файла (например, output.yaml)
-    output_file_path: str = os.path.join(BASE_DIR, "data", "output", f"{output_file_name}_data.k")
+    # Имя для файла
+    output_name = f"{output_file_name}_debug.txt"
+
+    output_dir = get_output_dir()
+
+    # Создаём директорию, если её нет
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Финальный путь к файлу
+    output_file_path: str = os.path.join(output_dir, output_name)
 
     # Запись в YAML
     with open(output_file_path, 'w', encoding="utf-8") as file:
@@ -105,8 +128,8 @@ def write_to_yaml(data: Dict[str, Any], file_path: str, output_path: str) -> str
     return directory
 
 
-def write_to_cd_by_k_word(data: Dict[str, Any], section_name: str, file_path_cd: str, output_path: str,
-                          key_words: List[str]) -> None:
+def write_to_cd_by_k_word(data: Dict[str, Any], section_name: str, file_path_cd: str,
+                          key_words: List[str]) -> str:
     if not ".cd" in file_path_cd:
         if not "output" in file_path_cd:
             file_path_cd += "/" + input_file_name + ".cd"
@@ -149,6 +172,35 @@ def write_to_cd_by_k_word(data: Dict[str, Any], section_name: str, file_path_cd:
         # Возвращаем обратно в .cd
         os.rename(file_path_txt, file_path_cd)
 
-    output_file_path: str = os.path.join(BASE_DIR, "data", "output", f"{output_file_name}.cd")
-    with open(output_file_path, "w", encoding="utf-8") as file:
-        file.writelines(output_lines)
+
+    if getattr(sys, 'frozen', False):
+        # Если приложение собрано в .exe или .app через PyInstaller
+        desktop_path = os.path.join(os.path.expanduser("~"), "Desktop", "output")
+        os.makedirs(desktop_path, exist_ok=True)
+
+        base_name = os.path.splitext(os.path.basename(file_path_cd))[0]
+
+        # Проверка, чтобы не добавить _output второй раз
+        if not base_name.endswith("_output"):
+            output_name = f"{base_name}_output.cd"
+        else:
+            output_name = f"{base_name}.cd"
+
+        output_file_path: str = os.path.join(desktop_path, output_name)
+
+        with open(output_file_path, "w", encoding="utf-8") as file:
+            file.writelines(output_lines)
+
+        return output_file_path
+    else:
+        if not "_output" in os.path.splitext(os.path.basename(file_path_cd))[0]:
+            output_file_path: str = os.path.join(BASE_DIR, "data", "output",
+                                             f"{os.path.splitext(os.path.basename(file_path_cd))[0]}_output.cd")
+        else:
+            output_file_path: str = os.path.join(BASE_DIR, "data", "output",
+                                                 f"{os.path.splitext(os.path.basename(file_path_cd))[0]}.cd")
+        with open(output_file_path, "w", encoding="utf-8") as file:
+            file.writelines(output_lines)
+            return output_file_path
+
+
