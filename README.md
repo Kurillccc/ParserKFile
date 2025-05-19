@@ -41,11 +41,24 @@
 
 ## 📸 Скрины
 
+### 💻 MacOS
+
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/0e1e7916-4722-42ce-9365-76f8ef91d1e9" />
+
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/acc1e23c-d980-472f-9225-44377677b1ec" />
+
+
+### ⊞ Windows
+
+
 
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/08cef0c0-c6be-49be-b2fe-addf97702e36" />
 
+### Результат работы в "ЛОГОС"
+
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/9568182d-7b73-41f4-ba73-2ada6b2941a6" />
+
+### Результат работы в "D3PLOT"
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/6d7dcf27-a2a0-4d1e-81bb-1fb183fe2453" />
 
