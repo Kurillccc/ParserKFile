@@ -1,4 +1,5 @@
 import os
+import threading
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from typing import Dict, Any
@@ -23,6 +24,26 @@ class Application(tk.Tk):
         self.resizable(False, False)
 
         self.create_widgets()
+
+    def finish_processing_ui(self):
+        self.process_button.config(state="normal")
+
+    def run_process_data_with_cleanup(self):
+        try:
+            self.process_data()
+        finally:
+            # Вернём управление в основной поток, чтобы включить кнопку
+            self.after(0, self.finish_processing_ui)
+
+    def run_in_thread(self):
+        self.output_text.delete(1.0, tk.END)
+        self.output_text.insert(tk.END, "⏳ Обработка... Пожалуйста, подождите.\n")
+
+        self.process_button.config(state="disabled")
+
+        # Запускаем поток
+        thread = threading.Thread(target=self.run_process_data_with_cleanup)
+        thread.start()
 
     def create_widgets(self) -> None:
         """Создание элементов интерфейса"""
@@ -75,7 +96,7 @@ class Application(tk.Tk):
         self.coordinate_option.grid(row=5, column=1, pady=5, padx=10)
 
         # Кнопка для обработки данных
-        self.process_button = tk.Button(self, text="Обработать", command=self.process_data)
+        self.process_button = tk.Button(self, text="Обработать", command=self.run_in_thread)
         self.process_button.grid(row=6, column=0, columnspan=2, pady=20)
 
         # Текстовое поле для отображения результатов

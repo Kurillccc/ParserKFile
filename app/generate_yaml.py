@@ -36,19 +36,22 @@ def generate_layer_data(num_layers: int, coordinate: str, density: float, PR: fl
         # Вычисление высоты слоя (h_for_layer)
         h_for_layer: float = h / num_layers * (len(layer_elements.items()) - layer_id) + h / (2 * num_layers)
 
+        sig_main: float = density * 9.8 * h_for_layer
+        sig: float = density * 9.8 * h_for_layer * PR / (1 - PR)
+
         # Определяем значения SIG в зависимости от выбранной координаты
         if coordinate == 'X':
-            sigxx: float = density * 9.8 * h_for_layer
-            sigyy: float = density * 9.8 * h_for_layer * PR / (1 - PR)
-            sigzz: float = density * 9.8 * h_for_layer * PR / (1 - PR)
+            sigxx: float = sig_main
+            sigyy: float = sig
+            sigzz: float = sig
         elif coordinate == 'Y':
-            sigxx: float = density * 9.8 * h_for_layer * PR / (1 - PR)
-            sigyy: float = density * 9.8 * h_for_layer
-            sigzz: float = density * 9.8 * h_for_layer * PR / (1 - PR)
+            sigxx: float = sig
+            sigyy: float = sig_main
+            sigzz: float = sig
         elif coordinate == 'Z':
-            sigxx: float = density * 9.8 * h_for_layer * PR / (1 - PR)
-            sigyy: float = density * 9.8 * h_for_layer * PR / (1 - PR)
-            sigzz: float = density * 9.8 * h_for_layer
+            sigxx: float = sig
+            sigyy: float = sig
+            sigzz: float = sig_main
 
         # Заполнение данных для CELL_SETS
         cell_sets.append({
