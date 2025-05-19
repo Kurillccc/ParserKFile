@@ -36,6 +36,12 @@ class Application(tk.Tk):
             self.after(0, self.finish_processing_ui)
 
     def run_in_thread(self):
+        if not self.input_k_file_path:
+            messagebox.showerror("Ошибка", "Выберите k файл для обработки")
+            return
+        if not self.input_cd_file_path:
+            messagebox.showerror("Ошибка", "Выберите cd файл для обработки")
+            return
         self.output_text.delete(1.0, tk.END)
         self.output_text.insert(tk.END, "⏳ Обработка... Пожалуйста, подождите.\n")
 
