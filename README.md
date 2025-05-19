@@ -74,11 +74,14 @@
 ## ⚡ Инструкция по запуску
 
 1. Клонируем проект (git clone https://github.com/Kurillccc/ParserKFile)
+
 2. Переходим в корень проекта (cd ParserKFile)
+
 3. Устанавливаем зависимости из requirements.txt 
 
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+
 4. Запускаем приложение с графическим интерфейсом (python run.py) или (python app/cli.py --input путь/к/файлу.k) для работы через консоль (там можно посмотреть что и как считается)
 
