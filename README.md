@@ -38,6 +38,7 @@
 - PyYAML
 
 ## 📸 Скрины
+
 <img width="677" alt="image" src="https://github.com/user-attachments/assets/08cef0c0-c6be-49be-b2fe-addf97702e36" />
 <img width="1326" alt="image" src="https://github.com/user-attachments/assets/9568182d-7b73-41f4-ba73-2ada6b2941a6" />
 
