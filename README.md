@@ -50,7 +50,7 @@
 
 ### ⊞ Windows
 
-
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/f800cd2a-9db1-449b-81db-c00685cd4beb" />
 
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/08cef0c0-c6be-49be-b2fe-addf97702e36" />
 
@@ -62,7 +62,7 @@
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/6d7dcf27-a2a0-4d1e-81bb-1fb183fe2453" />
 
-
+<img width="1128" alt="image" src="https://github.com/user-attachments/assets/711327d1-a616-42e7-8b30-df1aab5cb48e" />
 
 ## ⚡ Инструкция по запуску
 
