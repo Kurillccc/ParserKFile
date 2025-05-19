@@ -1,12 +1,12 @@
 import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from typing import Dict, List, Any
+from typing import Dict, Any
 
 from app.generate_yaml import generate_layer_data, write_to_yaml, write_to_cd_by_k_word
 from app.parser import parse_k_file
 from app.processor import filter_elements_by_subregion, find_elements_for_layer, find_h_and_home
-from app.settings import output_file_name, put_cell_sets, put_stress_set, put_set_solid
+from app.settings import put_cell_sets, put_stress_set, put_set_solid
 
 
 class Application(tk.Tk):
@@ -91,7 +91,7 @@ class Application(tk.Tk):
     def select_input_cd_file(self) -> None:
         """Открывает диалог для выбора файла"""
         self.input_cd_file_path = filedialog.askopenfilename(title="Выберите cd файл",
-                                                            filetypes=[("Text files", "*.cd")])
+                                                             filetypes=[("Text files", "*.cd")])
         if self.input_cd_file_path:
             self.input_cd_file_label.config(text=os.path.basename(self.input_cd_file_path))
 

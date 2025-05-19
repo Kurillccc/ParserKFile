@@ -172,7 +172,6 @@ def write_to_cd_by_k_word(data: Dict[str, Any], section_name: str, file_path_cd:
         # Возвращаем обратно в .cd
         os.rename(file_path_txt, file_path_cd)
 
-
     if getattr(sys, 'frozen', False):
         # Если приложение собрано в .exe или .app через PyInstaller
         desktop_path = os.path.join(os.path.expanduser("~"), "Desktop", "output")
@@ -195,12 +194,10 @@ def write_to_cd_by_k_word(data: Dict[str, Any], section_name: str, file_path_cd:
     else:
         if not "_output" in os.path.splitext(os.path.basename(file_path_cd))[0]:
             output_file_path: str = os.path.join(BASE_DIR, "data", "output",
-                                             f"{os.path.splitext(os.path.basename(file_path_cd))[0]}_output.cd")
+                                                 f"{os.path.splitext(os.path.basename(file_path_cd))[0]}_output.cd")
         else:
             output_file_path: str = os.path.join(BASE_DIR, "data", "output",
                                                  f"{os.path.splitext(os.path.basename(file_path_cd))[0]}.cd")
         with open(output_file_path, "w", encoding="utf-8") as file:
             file.writelines(output_lines)
             return output_file_path
-
-

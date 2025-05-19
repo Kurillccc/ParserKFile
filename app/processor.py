@@ -33,7 +33,8 @@ def group_nodes_by_coordinate(nodes: Dict[int, Tuple[float, float, float]], coor
     return grouped_nodes
 
 
-def find_h_and_home(nodes: Dict[int, Tuple[float, float, float]], coordinate: str) -> Tuple[float, Dict[int, Tuple[float, float, float]], List[Tuple[int, Tuple[float, float, float]]]]:
+def find_h_and_home(nodes: Dict[int, Tuple[float, float, float]], coordinate: str) -> Tuple[
+    float, Dict[int, Tuple[float, float, float]], List[Tuple[int, Tuple[float, float, float]]]]:
     """Находит высоту и координаты которые относятся к дому если он есть"""
     max_x = max_y = max_z = 0
 
