@@ -71,6 +71,9 @@
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/711327d1-a616-42e7-8b30-df1aab5cb48e" />
 
+<img width="1304" alt="image" src="https://github.com/user-attachments/assets/9b1e6cd5-a333-4139-a7a4-20f243455bba" />
+
+
 ## ⚡ Инструкция по запуску
 
 1. Клонируем проект (git clone https://github.com/Kurillccc/ParserKFile)
