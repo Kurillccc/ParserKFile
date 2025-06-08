@@ -65,13 +65,19 @@
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/9568182d-7b73-41f4-ba73-2ada6b2941a6" />
 
-### Результат работы в "D3PLOT"
+### Временная зависимость для вертикальной скорости точки поверхности массива с необработанным файлом (ограничение по Y от -0.75 до 0.75)
 
-<img width="800" alt="image" src="https://github.com/user-attachments/assets/6d7dcf27-a2a0-4d1e-81bb-1fb183fe2453" />
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/c30695c3-82b1-4e50-8fa3-1dbac755024e" />
 
-<img width="800" alt="image" src="https://github.com/user-attachments/assets/711327d1-a616-42e7-8b30-df1aab5cb48e" />
+### Временная зависимость для вертикальной скорости точки поверхности массива с обработанным файлом (ограничение по Y от -0.75 до 0.75)
 
-<img width="800" alt="image" src="https://github.com/user-attachments/assets/9b1e6cd5-a333-4139-a7a4-20f243455bba" />
+<img width="1070" alt="image" src="https://github.com/user-attachments/assets/cbcf8416-aaf7-4fa7-8e6e-c790354479f0" />
+
+### Временная зависимость для вертикальной скорости точки поверхности массива с обработанным файлом (ограничение по Y от -0.001 до 0.001)
+
+<img width="1061" alt="image" src="https://github.com/user-attachments/assets/3b55cdf0-fdba-40c0-adda-e0b13b899464" />
+
+Видим, что задание начального поля позволило значительно уменьшить остаточные колебания массива сплошной среды от приложения поля силы тяжести. Таким образом, определение НДС подобласти от поля силы тяжести проведено с большей точностью. Программа автоматизированного построения наборов элементов и задания начальных полей напряжений позволила упростить и ускорить этот процесс.
 
 
 ## ⚡ Инструкция по запуску
